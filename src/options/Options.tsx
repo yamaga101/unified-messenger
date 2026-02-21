@@ -69,6 +69,7 @@ export default function Options(): React.JSX.Element {
         const defaults: ServiceConfig[] = ALL_SERVICES.map((type) => ({
           type,
           enabled: false,
+          notificationsEnabled: true,
           pollingIntervalSec: SERVICE_CONFIG[type].pollingIntervalSec,
         }));
         setConfigs(defaults);
@@ -83,6 +84,7 @@ export default function Options(): React.JSX.Element {
       configs.find((c) => c.type === type) ?? {
         type,
         enabled: false,
+        notificationsEnabled: true,
         pollingIntervalSec: SERVICE_CONFIG[type].pollingIntervalSec,
       }
     );
@@ -163,6 +165,26 @@ export default function Options(): React.JSX.Element {
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600" />
                 </label>
               </div>
+
+              {/* Notification toggle */}
+              {config.enabled && (
+                <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
+                  <span className="text-xs text-gray-600">Desktop notifications</span>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={config.notificationsEnabled !== false}
+                      onChange={() =>
+                        updateConfig(type, {
+                          notificationsEnabled: !(config.notificationsEnabled !== false),
+                        })
+                      }
+                    />
+                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600" />
+                  </label>
+                </div>
+              )}
 
               {/* Config fields */}
               {config.enabled && fields && (

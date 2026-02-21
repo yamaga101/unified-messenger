@@ -32,6 +32,7 @@ export interface ServiceStatus {
 export interface ServiceConfig {
   type: ServiceType;
   enabled: boolean;
+  notificationsEnabled: boolean;
   pollingIntervalSec: number;
   // Service-specific config
   apiToken?: string;

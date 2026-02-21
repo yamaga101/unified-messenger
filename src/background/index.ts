@@ -4,7 +4,7 @@ import {
   updateBadge,
   setupNotificationClickHandler,
 } from "./notifications";
-import { ALL_SERVICES, SERVICE_CONFIG } from "@/lib/constants";
+import { ALL_SERVICES, SERVICE_CONFIG, MAX_MESSAGES_PER_SERVICE } from "@/lib/constants";
 import {
   getServiceConfigs,
   saveServiceConfigs,
@@ -13,6 +13,7 @@ import {
   getStatuses,
   saveStatuses,
 } from "@/lib/storage";
+import { withRetry } from "@/lib/retry";
 import type {
   MessageAction,
   ServiceConfig,
@@ -20,7 +21,6 @@ import type {
   ServiceType,
   UnifiedMessage,
 } from "@/services/types";
-import { MAX_MESSAGES_PER_SERVICE } from "@/lib/constants";
 
 // Service imports
 import { GmailService } from "@/services/gmail";
@@ -65,7 +65,8 @@ async function initializeServices(): Promise<void> {
   if (configs.length === 0) {
     configs = ALL_SERVICES.map((type) => ({
       type,
-      enabled: type === "gmail" || type === "chatwork", // Enable common ones by default
+      enabled: type === "gmail" || type === "chatwork",
+      notificationsEnabled: true,
       pollingIntervalSec: SERVICE_CONFIG[type].pollingIntervalSec,
     }));
     await saveServiceConfigs(configs);
@@ -97,7 +98,7 @@ async function pollService(serviceType: ServiceType): Promise<void> {
   const statusIdx = statuses.findIndex((s) => s.type === serviceType);
 
   try {
-    const messages = await service.fetchMessages();
+    const messages = await withRetry(() => service.fetchMessages());
     const unreadCount = messages.filter((m) => m.isUnread).length;
 
     // Update storage
@@ -112,16 +113,20 @@ async function pollService(serviceType: ServiceType): Promise<void> {
     await saveMessages(updatedMessages);
 
     // Check for new messages to notify
-    const oldIds = new Set(
-      allMessages
-        .filter((m) => m.serviceType === serviceType)
-        .map((m) => m.id),
-    );
-    const newMessages = messages.filter(
-      (m) => m.isUnread && !oldIds.has(m.id),
-    );
-    for (const msg of newMessages.slice(0, 3)) {
-      showNotification(msg);
+    const configs = await getServiceConfigs();
+    const serviceConfig = configs.find((c) => c.type === serviceType);
+    if (serviceConfig?.notificationsEnabled !== false) {
+      const oldIds = new Set(
+        allMessages
+          .filter((m) => m.serviceType === serviceType)
+          .map((m) => m.id),
+      );
+      const newMessages = messages.filter(
+        (m) => m.isUnread && !oldIds.has(m.id),
+      );
+      for (const msg of newMessages.slice(0, 3)) {
+        showNotification(msg);
+      }
     }
 
     // Update status

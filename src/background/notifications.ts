@@ -1,5 +1,6 @@
-import type { UnifiedMessage, ServiceType } from "@/services/types";
+import type { UnifiedMessage } from "@/services/types";
 import { SERVICE_CONFIG } from "@/lib/constants";
+import { getMessages } from "@/lib/storage";
 
 const SHOWN_NOTIFICATION_IDS = new Set<string>();
 
@@ -36,8 +37,14 @@ export function updateBadge(totalUnread: number): void {
 }
 
 export function setupNotificationClickHandler(): void {
-  chrome.notifications.onClicked.addListener((notificationId) => {
+  chrome.notifications.onClicked.addListener(async (notificationId) => {
     chrome.notifications.clear(notificationId);
-    // Open the deep link — stored messages will be checked by service worker
+
+    // Find the message and open its deepLink
+    const messages = await getMessages();
+    const message = messages.find((m) => m.id === notificationId);
+    if (message?.deepLink) {
+      await chrome.tabs.create({ url: message.deepLink });
+    }
   });
 }
