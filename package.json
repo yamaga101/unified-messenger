@@ -1,0 +1,28 @@
+{
+  "name": "unified-messenger",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Unified messaging dashboard Chrome extension - 8 services in one side panel",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "^2.3.0",
+    "@tailwindcss/vite": "^4.1.18",
+    "@types/chrome": "^0.1.36",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.4",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1"
+  },
+  "dependencies": {
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  }
+}
