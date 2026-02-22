@@ -1,6 +1,6 @@
 {
   "name": "unified-messenger",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": true,
   "description": "Unified messaging dashboard Chrome extension - 8 services in one side panel",
   "type": "module",

@@ -122,6 +122,27 @@ export default function Options(): React.JSX.Element {
     try {
       // Auto-save before testing
       await saveServiceConfigs(configs);
+
+      // Request host permission for services with custom URLs
+      if (type === "garoon") {
+        const config = getConfig(type);
+        const baseUrl = config.baseUrl?.replace(/\/+$/, "");
+        if (baseUrl) {
+          try {
+            const origin = new URL(baseUrl).origin + "/*";
+            const granted = await chrome.permissions.request({
+              origins: [origin],
+            });
+            if (!granted) {
+              alert("ホストへのアクセス権限が拒否されました。");
+              return;
+            }
+          } catch {
+            // Permission already granted or invalid URL
+          }
+        }
+      }
+
       await chrome.runtime.sendMessage({
         type: "REQUEST_REFRESH",
         service: type,
