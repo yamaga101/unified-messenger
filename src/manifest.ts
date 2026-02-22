@@ -25,7 +25,7 @@ export default defineManifest({
   ],
   optional_host_permissions: ["https://*/*"],
   oauth2: {
-    client_id: "YOUR_GCP_CLIENT_ID.apps.googleusercontent.com",
+    client_id: "550331176292-kjl3kcttsjbrs476p4fluosfk92qe4ue.apps.googleusercontent.com",
     scopes: [
       "https://www.googleapis.com/auth/gmail.readonly",
       "https://www.googleapis.com/auth/chat.messages.readonly",
