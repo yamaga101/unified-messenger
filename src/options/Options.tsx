@@ -120,13 +120,15 @@ export default function Options(): React.JSX.Element {
 
   const handleTestConnection = async (type: ServiceType): Promise<void> => {
     try {
+      // Auto-save before testing
+      await saveServiceConfigs(configs);
       await chrome.runtime.sendMessage({
         type: "REQUEST_REFRESH",
         service: type,
       });
-      alert(`${SERVICE_CONFIG[type].label}: Connection test triggered. Check side panel for results.`);
+      alert(`${SERVICE_CONFIG[type].label}: 接続テスト実行中。サイドパネルで結果を確認してください。`);
     } catch {
-      alert("Failed to test connection.");
+      alert("接続テストに失敗しました。");
     }
   };
 

@@ -3,7 +3,7 @@ import { defineManifest } from "@crxjs/vite-plugin";
 export default defineManifest({
   manifest_version: 3,
   name: "Unified Messenger",
-  version: "0.1.2",
+  version: "0.1.3",
   description:
     "8つのメッセージングサービスを1つのサイドパネルに統合するダッシュボード",
   permissions: [
