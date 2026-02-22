@@ -32,10 +32,26 @@ export class GaroonService extends BaseService {
     return (this.config.baseUrl ?? "").replace(/\/+$/, "");
   }
 
-  private get authHeader(): string {
+  /**
+   * Garoon uses X-Cybozu-Authorization (base64 of user:pass) for app login.
+   * Optionally, a web server / reverse proxy Basic Auth is sent as Authorization header.
+   */
+  private buildHeaders(): Record<string, string> {
     const user = this.config.username ?? "";
     const pass = this.config.password ?? "";
-    return `Basic ${btoa(`${user}:${pass}`)}`;
+    const headers: Record<string, string> = {
+      "X-Cybozu-Authorization": btoa(`${user}:${pass}`),
+      "Content-Type": "application/json",
+    };
+
+    // Optional: web server / reverse proxy Basic Auth (separate layer)
+    const proxyUser = this.config.proxyUsername ?? "";
+    const proxyPass = this.config.proxyPassword ?? "";
+    if (proxyUser) {
+      headers["Authorization"] = `Basic ${btoa(`${proxyUser}:${proxyPass}`)}`;
+    }
+
+    return headers;
   }
 
   private async apiFetch<T>(path: string): Promise<T> {
@@ -44,10 +60,7 @@ export class GaroonService extends BaseService {
     }
 
     const res = await fetch(`${this.baseUrl}/api/v1${path}`, {
-      headers: {
-        Authorization: this.authHeader,
-        "Content-Type": "application/json",
-      },
+      headers: this.buildHeaders(),
     });
 
     if (!res.ok) {

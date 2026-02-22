@@ -42,6 +42,10 @@ export class GoogleChatService extends BaseService {
       headers: { Authorization: `Bearer ${token}` },
     });
 
+    if (res.status === 403 || res.status === 404) {
+      throw new Error("Google Chat requires a Google Workspace account");
+    }
+
     if (!res.ok) {
       throw new Error(`Google Chat API error: ${res.status}`);
     }

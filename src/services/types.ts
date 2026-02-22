@@ -39,6 +39,9 @@ export interface ServiceConfig {
   baseUrl?: string;
   username?: string;
   password?: string;
+  // Garoon: optional web server / proxy Basic Auth (separate from Garoon login)
+  proxyUsername?: string;
+  proxyPassword?: string;
 }
 
 export type MessageAction =

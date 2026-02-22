@@ -3,7 +3,7 @@ import type { ServiceConfig, ServiceType } from "@/services/types";
 import { SERVICE_CONFIG, ALL_SERVICES } from "@/lib/constants";
 import { getServiceConfigs, saveServiceConfigs } from "@/lib/storage";
 
-type ConfigField = "apiToken" | "baseUrl" | "username" | "password";
+type ConfigField = "apiToken" | "baseUrl" | "username" | "password" | "proxyUsername" | "proxyPassword";
 
 interface ServiceFieldDef {
   key: ConfigField;
@@ -26,19 +26,31 @@ const SERVICE_FIELDS: Partial<Record<ServiceType, ServiceFieldDef[]>> = {
       key: "baseUrl",
       label: "Garoon URL",
       type: "url",
-      placeholder: "https://garoon.example.com",
+      placeholder: "https://garoon.example.com/cgi-bin/cbgrn/grn.cgi",
     },
     {
       key: "username",
-      label: "Username",
+      label: "Garoon ログインID",
       type: "text",
-      placeholder: "username",
+      placeholder: "Garoon user code",
     },
     {
       key: "password",
-      label: "Password",
+      label: "Garoon パスワード",
       type: "password",
-      placeholder: "password",
+      placeholder: "Garoon password",
+    },
+    {
+      key: "proxyUsername",
+      label: "Web認証 ユーザー名 (任意)",
+      type: "text",
+      placeholder: "Proxy / Basic Auth username",
+    },
+    {
+      key: "proxyPassword",
+      label: "Web認証 パスワード (任意)",
+      type: "password",
+      placeholder: "Proxy / Basic Auth password",
     },
   ],
   teams: [
@@ -263,7 +275,7 @@ function getAuthDescription(type: ServiceType): string {
     case "chatwork":
       return "API Token required";
     case "garoon":
-      return "Basic Auth (on-prem)";
+      return "X-Cybozu-Authorization + Web認証 (on-prem)";
     case "teams":
       return "Azure AD OAuth";
     case "slack":
