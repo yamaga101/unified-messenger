@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import type { ServiceStatus, UnifiedMessage, ServiceType } from "@/services/types";
 import { ServiceCard } from "./components/ServiceCard";
 import { StatusBar } from "./components/StatusBar";
+import { SettingsPanel } from "./components/SettingsPanel";
 import { ALL_SERVICES } from "@/lib/constants";
 
 export default function App(): React.JSX.Element {
@@ -9,6 +10,7 @@ export default function App(): React.JSX.Element {
   const [messages, setMessages] = useState<UnifiedMessage[]>([]);
   const [expandedService, setExpandedService] = useState<ServiceType | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const loadData = useCallback(async () => {
     try {
@@ -106,9 +108,9 @@ export default function App(): React.JSX.Element {
               </svg>
             </button>
             <button
-              onClick={() => chrome.runtime.openOptionsPage()}
-              className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-              title="Settings"
+              onClick={() => setShowSettings((prev) => !prev)}
+              className={`p-1.5 hover:bg-gray-100 rounded-md transition-colors ${showSettings ? "text-blue-600" : "text-gray-500 hover:text-gray-700"}`}
+              title="Quick Settings"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
@@ -128,6 +130,9 @@ export default function App(): React.JSX.Element {
           </div>
         </div>
       </header>
+
+      {/* Quick Settings Panel */}
+      {showSettings && <SettingsPanel />}
 
       {/* Status Bar */}
       <StatusBar statuses={enabledStatuses} />

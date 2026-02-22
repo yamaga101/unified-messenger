@@ -98,7 +98,7 @@ export class TeamsService extends BaseService {
             content: this.stripHtml(msg.body.content).slice(0, 200),
             timestamp: new Date(msg.createdDateTime).getTime(),
             isUnread: true,
-            deepLink: this.getDeepLink(msg.id),
+            deepLink: this.getDeepLink(msg.id, chat.id),
             channelName: chat.topic ?? "Chat",
           });
         }
@@ -121,7 +121,10 @@ export class TeamsService extends BaseService {
     return messages.filter((m) => m.isUnread).length;
   }
 
-  getDeepLink(_messageId: string): string {
+  getDeepLink(_messageId: string, chatId?: string): string {
+    if (chatId) {
+      return `https://teams.microsoft.com/l/chat/${chatId}/0`;
+    }
     return "https://teams.microsoft.com/";
   }
 

@@ -78,7 +78,7 @@ export class GaroonService extends BaseService {
 
   async getUnreadCount(): Promise<number> {
     const data = await this.apiFetch<GaroonNotificationResponse>(
-      "/notification/items?limit=1&fields=id,isRead",
+      "/notification/items?limit=100&fields=id,isRead",
     );
     return data.notifications.filter((n) => !n.isRead).length;
   }

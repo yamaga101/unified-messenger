@@ -30,9 +30,21 @@ const SLACK_API = "https://slack.com/api";
 
 export class SlackService extends BaseService {
   private userCache = new Map<string, SlackUserProfile>();
+  private teamId: string | null = null;
 
   constructor(config: ServiceConfig) {
     super(config);
+  }
+
+  private async getTeamId(): Promise<string> {
+    if (this.teamId) return this.teamId;
+    try {
+      const data = await this.apiFetch<{ team_id: string }>("auth.test");
+      this.teamId = data.team_id;
+      return this.teamId;
+    } catch {
+      return "T00000000";
+    }
   }
 
   private get token(): string {
@@ -78,6 +90,9 @@ export class SlackService extends BaseService {
   }
 
   async fetchMessages(): Promise<UnifiedMessage[]> {
+    // Pre-fetch team ID for deep links
+    await this.getTeamId();
+
     const channelsData = await this.apiFetch<{ channels: SlackChannel[] }>(
       "conversations.list",
       { types: "public_channel,private_channel,im,mpim", limit: "20" },
@@ -135,9 +150,18 @@ export class SlackService extends BaseService {
       .reduce((sum, c) => sum + (c.unread_count_display ?? 0), 0);
   }
 
+  async getDeepLinkAsync(messageTs: string, channelId?: string): Promise<string> {
+    if (channelId) {
+      const teamId = await this.getTeamId();
+      return `https://app.slack.com/client/${teamId}/${channelId}/p${messageTs.replace(".", "")}`;
+    }
+    return "https://app.slack.com/";
+  }
+
   getDeepLink(messageTs: string, channelId?: string): string {
     if (channelId) {
-      return `https://app.slack.com/client/T00000000/${channelId}/p${messageTs.replace(".", "")}`;
+      const teamId = this.teamId ?? "T00000000";
+      return `https://app.slack.com/client/${teamId}/${channelId}/p${messageTs.replace(".", "")}`;
     }
     return "https://app.slack.com/";
   }
