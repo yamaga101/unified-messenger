@@ -19,7 +19,7 @@ interface GaroonNotification {
 }
 
 interface GaroonNotificationResponse {
-  notifications: GaroonNotification[];
+  items: GaroonNotification[];
   hasNext: boolean;
 }
 
@@ -75,7 +75,7 @@ export class GaroonService extends BaseService {
       "/notification/items?limit=20&fields=id,creator,createdAt,title,body,url,isRead",
     );
 
-    return data.notifications
+    return data.items
       .filter((n) => !n.isRead)
       .slice(0, MAX_MESSAGES_PER_SERVICE)
       .map((n) => ({
@@ -93,7 +93,7 @@ export class GaroonService extends BaseService {
     const data = await this.apiFetch<GaroonNotificationResponse>(
       "/notification/items?limit=100&fields=id,isRead",
     );
-    return data.notifications.filter((n) => !n.isRead).length;
+    return data.items.filter((n) => !n.isRead).length;
   }
 
   getDeepLink(messageId: string, url?: string): string {
