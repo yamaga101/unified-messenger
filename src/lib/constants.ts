@@ -22,7 +22,7 @@ export const SERVICE_CONFIG = {
   garoon: {
     label: "Garoon",
     color: "#1E88E5",
-    pollingIntervalSec: 60,
+    pollingIntervalSec: 300,
     icon: "🏢",
   },
   teams: {
